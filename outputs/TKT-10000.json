@@ -1,0 +1,44 @@
+{
+  "ticket_id": "TKT-10000",
+  "account_id": "ACC-1881",
+  "category": "feature_request",
+  "priority": "P4",
+  "route_to": "product",
+  "escalate": false,
+  "notify_tam": true,
+  "duplicate_of": null,
+  "needs_clarification": false,
+  "kb_references": [
+    "products/databridge-pro#data-ingestion"
+  ],
+  "account_signals": [
+    "Plan tier: Starter",
+    "Health status: At Risk",
+    "Usage trend: Inactive",
+    "Renewal: 2027-03-01",
+    "TAM: Fatima Al-Rashid"
+  ],
+  "customer_reply": "Hi,\n\nThank you for reaching out to us. We understand that having a bulk archive operation in Data Ingestion is essential as your team scales to 116 users.\n\nCurrently, DataBridge Pro supports archiving entries individually. We have forwarded your request directly to our Product team as an enhancement suggestion for bulk data management operations.\n\nWe will update you on this ticket as our product roadmap develops. In the meantime, please let us know if we can assist with scripting this via our public API as a temporary automation.\n\nBest regards,\nProduct Support",
+  "internal_note": "- Account: ACC-1881 (Massive Dynamic) – Starter tier, At Risk health, Inactive usage.\n- Ticket miscategorized as Billing P2 at intake; this is a clear feature_request, priority P4, routed to product.\n- Policy requires notify_tam=True due to At Risk health status and Inactive usage trend.\n- No duplicate tickets in last 90 days.\n- KB references: products/databridge-pro#data-ingestion.",
+  "confidence": 0.95,
+  "reasoning_trace": [
+    {
+      "step": 1,
+      "action": "find_account",
+      "input": "by='company_name', value='Massive Dynamic'",
+      "observation": "Found account ACC-1881 (Massive Dynamic), Starter tier."
+    },
+    {
+      "step": 2,
+      "action": "get_account",
+      "input": "account_id='ACC-1881'",
+      "observation": "Account profile loaded: Starter tier, At Risk health, Inactive usage trend, TAM Fatima Al-Rashid."
+    },
+    {
+      "step": 3,
+      "action": "search_kb",
+      "input": "query='DataBridge Pro bulk archive entries Data Ingestion'",
+      "observation": "Retrieved products/databridge-pro#data-ingestion; bulk archive not currently supported."
+    }
+  ]
+}

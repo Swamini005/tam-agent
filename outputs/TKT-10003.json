@@ -1,0 +1,44 @@
+{
+  "ticket_id": "TKT-10003",
+  "account_id": "ACC-1785",
+  "category": "bug",
+  "priority": "P2",
+  "route_to": "L2_engineering",
+  "escalate": false,
+  "notify_tam": true,
+  "duplicate_of": null,
+  "needs_clarification": false,
+  "kb_references": [
+    "products/securevault#authentication"
+  ],
+  "account_signals": [
+    "Plan tier: Starter",
+    "Health status: At Risk",
+    "Usage trend: Stable",
+    "Renewal: 2027-05-18",
+    "TAM: Fatima Al-Rashid"
+  ],
+  "customer_reply": "Hi,\n\nThank you for alerting us to this issue. The CHECKSUM_MISMATCH error on chunk 47 when updating permissions in SecureVault indicates a corrupted permission state following the recent update.\n\nOur engineering team is actively investigating this backend validation error. We have prioritized this ticket and will update you as soon as a fix or database patch is applied to restore your permission management access.\n\nBest regards,\nSecureVault Engineering Support",
+  "internal_note": "- Account: ACC-1785 (Cyberdyne Systems) – Starter tier, At Risk health status.\n- Issue: CHECKSUM_MISMATCH: data integrity error on chunk 47 in SecureVault Authentication module.\n- High-impact permission management failure; classified as bug, P2, routed to L2_engineering.\n- Policy requires notify_tam=True due to At Risk health status.\n- KB references: products/securevault#authentication.",
+  "confidence": 0.9,
+  "reasoning_trace": [
+    {
+      "step": 1,
+      "action": "find_account",
+      "input": "by='company_name', value='Cyberdyne Systems'",
+      "observation": "Found account ACC-1785 (Cyberdyne Systems), Starter tier."
+    },
+    {
+      "step": 2,
+      "action": "get_account",
+      "input": "account_id='ACC-1785'",
+      "observation": "Account profile loaded: Starter tier, At Risk health, TAM Fatima Al-Rashid."
+    },
+    {
+      "step": 3,
+      "action": "search_kb",
+      "input": "query='SecureVault Authentication CHECKSUM_MISMATCH error'",
+      "observation": "Retrieved products/securevault#authentication."
+    }
+  ]
+}

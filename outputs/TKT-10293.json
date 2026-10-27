@@ -1,0 +1,53 @@
+{
+  "ticket_id": "TKT-10293",
+  "account_id": "ACC-7397",
+  "category": "bug",
+  "priority": "P2",
+  "route_to": "L2_engineering",
+  "escalate": false,
+  "notify_tam": true,
+  "duplicate_of": null,
+  "needs_clarification": true,
+  "kb_references": [
+    "products/databridge-pro#api",
+    "troubleshooting/performance-and-integrations#step-1--identify-where-the-slowness-is"
+  ],
+  "account_signals": [
+    "Plan tier: Starter",
+    "Health status: At Risk",
+    "Usage trend: Stable",
+    "Renewal in 71 days",
+    "TAM: Yuki Tanaka",
+    "Negative sentiment detected in recent support tickets",
+    "3 consecutive P1 tickets in the last 30 days"
+  ],
+  "customer_reply": "Hi Avery,\n\nThank you for reaching out. I am sorry to hear that DataBridge Pro is running slowly for your team.\n\nTo help us diagnose and isolate the problem quickly, could you please provide:\n\n1. Scope of the slowdown – is it impacting the web UI, API operations, or pipeline execution?\n2. Any specific error codes or HTTP response statuses (e.g. 504 timeouts)?\n3. Have any configuration or source schema changes been made in the last 14 days?\n4. Are specific pipelines impacted, or all workloads across the board?\n5. Are your teams connecting through a corporate VPN or proxy?\n\nOnce we have these details, we will immediately correlate them with platform metrics and engage engineering.\n\nBest regards,\nSupport Engineering",
+  "internal_note": "- Account: ACC-7397 (Gavin Belson Co) – Starter tier (ticket incorrectly marked Business).\n- Health is At Risk with renewal in 71 days (within 90-day window) -> notify TAM Yuki Tanaka.\n- Issue is widespread performance slowness; P2 routed to L2_engineering.\n- Escalation history shows 3 P1s in last 30 days; handle with high priority.\n- No duplicate tickets found for DataBridge Pro slowness.",
+  "confidence": 0.86,
+  "reasoning_trace": [
+    {
+      "step": 1,
+      "action": "find_account",
+      "input": "by='account_id', value='ACC-3336'",
+      "observation": "Account ACC-3336 belongs to Omni Consumer Products; ticket is from Gavin Belson Co. Mismatch."
+    },
+    {
+      "step": 2,
+      "action": "find_account",
+      "input": "by='company_name', value='Gavin Belson Co'",
+      "observation": "Found account ACC-7397 (Gavin Belson Co), Starter tier."
+    },
+    {
+      "step": 3,
+      "action": "get_account",
+      "input": "account_id='ACC-7397'",
+      "observation": "Account is At Risk, renewal date 2026-07-30 (71 days), negative sentiment, 3 recent P1s."
+    },
+    {
+      "step": 4,
+      "action": "search_kb",
+      "input": "query='DataBridge Pro running extremely slowly troubleshooting'",
+      "observation": "Found troubleshooting/performance-and-integrations#step-1--identify-where-the-slowness-is and products/databridge-pro#api."
+    }
+  ]
+}

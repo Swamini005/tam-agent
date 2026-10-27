@@ -3,8 +3,8 @@ import os
 
 from groq import BadRequestError
 
-from schema import Decision
-from tools import TOOLS
+from tam_agent.schema import Decision
+from tam_agent.tools import TOOLS
 
 MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
 TOKEN_LIMIT = int(os.getenv("GROQ_TOKEN_LIMIT", "8000"))

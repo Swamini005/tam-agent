@@ -1,0 +1,58 @@
+{
+  "ticket_id": "TKT-10197",
+  "account_id": "ACC-8956",
+  "category": "bug",
+  "priority": "P2",
+  "route_to": "L2_engineering",
+  "escalate": false,
+  "notify_tam": true,
+  "duplicate_of": null,
+  "needs_clarification": true,
+  "kb_references": [
+    "troubleshooting/performance-and-integrations#step-1--identify-where-the-slowness-is"
+  ],
+  "account_signals": [
+    "Plan tier: Starter",
+    "Health status: At Risk",
+    "Usage trend: Increasing",
+    "Renewal in 151 days",
+    "TAM: Yuki Tanaka",
+    "Open tickets: 3",
+    "Customer expressed frustration with response times in last sync"
+  ],
+  "customer_reply": "Hi Sam,\n\nThank you for letting us know about the slow loading times on the SecureVault Key Management dashboard. I understand how critical it is to have the dashboard ready for your upcoming board presentation.\n\nTo help us investigate effectively, could you please provide a few more details?\n\n1. Does the slowness affect only the Key Management dashboard, or all SecureVault pages?\n2. Which browser and version are you using?\n3. Have there been any recent network or environment changes (e.g. new VPN, firewall rules)?\n4. Are there any console errors or warnings visible in developer tools?\n5. Have you tested clearing the browser cache or accessing from another device?\n\nOnce we have this information, our engineering team will run targeted diagnostics to restore performance ahead of your presentation.\n\nBest regards,\nSupport Engineering",
+  "internal_note": "- Account: ACC-8956 (Hadley Industries) – Starter tier, At Risk health, renewal in 151 days.\n- Urgency: intake marked P3 but 76s board-blocking latency warrants P2.\n- Routed to L2_engineering for latency diagnostics.\n- No duplicate tickets in last 90 days.\n- KB reference: troubleshooting/performance-and-integrations#step-1--identify-where-the-slowness-is.\n- Notify TAM Yuki Tanaka due to At Risk account status.\n- No escalation required at this stage.",
+  "confidence": 0.88,
+  "reasoning_trace": [
+    {
+      "step": 1,
+      "action": "find_account",
+      "input": "by='account_id', value='ACC-5748' - Verify account matches company",
+      "observation": "Account ACC-5748 belongs to Nexus Data, ticket is Hadley Industries. Mismatch detected."
+    },
+    {
+      "step": 2,
+      "action": "find_account",
+      "input": "by='company_name', value='Hadley Industries'",
+      "observation": "Found canonical account ACC-8956 (Hadley Industries), Starter plan."
+    },
+    {
+      "step": 3,
+      "action": "get_account",
+      "input": "account_id='ACC-8956'",
+      "observation": "Account is At Risk, renewal date 2026-10-19 (151 days), TAM Yuki Tanaka, seats: 1690 lic / 997 act."
+    },
+    {
+      "step": 4,
+      "action": "get_ticket_history",
+      "input": "account_id='ACC-8956', days=90",
+      "observation": "Found 3 previous tickets; no duplicate dashboard performance tickets."
+    },
+    {
+      "step": 5,
+      "action": "search_kb",
+      "input": "query='SecureVault dashboard loading slow performance troubleshooting'",
+      "observation": "Retrieved troubleshooting/performance-and-integrations#step-1--identify-where-the-slowness-is (current)."
+    }
+  ]
+}

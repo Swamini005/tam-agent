@@ -25,18 +25,18 @@ The system is organized into four main layers: the agent, the tool and retrieval
 flowchart TB
     INPUT["Support Ticket + Execution Context"]
 
-    subgraph AGENT["Agent Layer — agent.py"]
+    subgraph AGENT["Agent Layer â€” agent.py"]
         LOOP["Agent Decision Loop"]
         PROMPT["System Prompt and Triage Policy"]
         STATE["Conversation State and Step Log"]
     end
 
-    subgraph LLM["LLM Layer — llm.py"]
+    subgraph LLM["LLM Layer â€” llm.py"]
         MODEL["Groq API<br/>openai/gpt-oss-120b"]
         FORMAT["Tool Calling / Structured JSON"]
     end
 
-    subgraph TOOLS["Tool Layer — tools.py"]
+    subgraph TOOLS["Tool Layer â€” tools.py"]
         FA["find_account"]
         GA["get_account"]
         TH["get_ticket_history"]
@@ -97,11 +97,13 @@ flowchart TB
 
 | Component | Responsibility |
 |---|---|
-| `agent.py` | Runs the agent loop, supplies triage instructions, records steps, validates decisions, and exposes the CLI. |
-| `llm.py` | Manages Groq requests, tool calls, tool results, structured output generation, rate-limit retries, and token-budget handling. |
-| `tools.py` | Loads the datasets and exposes account, ticket-history, ticket-detail, and KB tools. |
-| `schema.py` | Defines the Pydantic output schema and allowed decision fields. |
-| `check_output.py` | Validates generated JSON files against the output contract. |
+| `run.py` | Top-level CLI runner supporting `--set review`, specific ticket IDs, or `--sample N`. |
+| `tam_agent/agent.py` | Runs the agent loop, supplies triage instructions, records steps, validates decisions, and implements `triage(ticket, ctx)`. |
+| `tam_agent/llm.py` | Manages Groq requests, tool calls, tool results, structured output generation, rate-limit retries, and token-budget handling. |
+| `tam_agent/tools.py` | Loads the datasets and exposes account, ticket-history, ticket-detail, and KB tools. |
+| `tam_agent/schema.py` | Defines the required output schema, allowed decision categories/routes, and `validate(out)`. |
+| `scripts/check_outputs.py` | Validates generated JSON files against the output contract (must show 10/10 valid). |
+| `scripts/validate_data.py` | Verifies dataset integrity. |
 
 The account and ticket datasets are treated as the source of truth for structured facts. The LLM interprets those facts but does not independently invent account records or ticket history.
 
@@ -320,24 +322,28 @@ Never commit `.env` or API keys to version control.
 
 ## 9. Running the Agent
 
+Run the 10-ticket review set:
+
+```bash
+python run.py --set review
+```
+
 Process specific tickets:
 
 ```bash
-python agent.py TKT-10042 TKT-10050
+python run.py TKT-10042 TKT-10050
 ```
-
-The expected behavior is to generate one JSON output per requested ticket under `outputs/`.
 
 Run a random sample of 10 tickets:
 
 ```bash
-python agent.py --sample 10
+python run.py --sample 10
 ```
 
 Validate generated outputs:
 
 ```bash
-python check_output.py outputs/
+python scripts/check_outputs.py
 ```
 
 **Submission note:** The hiring assignment requires processing the exact 10 tickets in `data/review_set.txt`, using the original starter repository's execution interface and checker. If this standalone implementation is being used for that submission, ensure it also supports the required review-set command and output/run-log contract before submitting.
@@ -365,7 +371,7 @@ The 10-ticket review set is useful for targeted evaluation, but broader human-re
 
 The dataset contains approximately 3,000 tickets, 200 accounts, 12 months of usage metrics, and 390 KB articles.
 
-At 10× the data volume, I would:
+At 10Ã— the data volume, I would:
 
 - Index structured account and ticket fields for efficient lookups.
 - Precompute lexical KB indexes and introduce hybrid retrieval where it improves recall.

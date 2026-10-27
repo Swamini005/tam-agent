@@ -1,0 +1,46 @@
+{
+  "ticket_id": "TKT-10455",
+  "account_id": "ACC-3336",
+  "category": "how_to",
+  "priority": "P4",
+  "route_to": "L1_support",
+  "escalate": false,
+  "notify_tam": true,
+  "duplicate_of": null,
+  "needs_clarification": true,
+  "kb_references": [
+    "billing/billing-and-plans#how-seat-billing-works"
+  ],
+  "account_signals": [
+    "Plan tier: Business",
+    "Health status: At Risk",
+    "Usage trend: Inactive",
+    "Renewal: 2026-08-19",
+    "TAM: Rohan Mehta",
+    "3 consecutive P1 tickets in the last 30 days",
+    "Decision maker considering competing vendor evaluation"
+  ],
+  "customer_reply": "Hi Quinn,\n\nThank you for reaching out regarding invoice #60685.\n\nPer our billing policy, a licensed seat is tallied for any user who was active (logged in or invoked API resources) during the billing month. User deactivations take effect at the start of the next billing cycle, which is why your active count today may differ from the total billed seats for that period.\n\nTo ensure our finance team can review your invoice accurately, could you please provide:\n\n1. A list or export (CSV) of user accounts or emails you believe were incorrectly billed.\n2. The specific billing month in question.\n\nOnce we receive this information, we will audit the activity logs and review eligibility for an account credit.\n\nBest regards,\nBilling Support",
+  "internal_note": "- Account: ACC-3336 (Omni Consumer Products) – Business tier, At Risk health, Inactive usage.\n- Escalation notes show competitor evaluation and recent P1s.\n- Ticket category: how_to / billing inquiry, priority P4, routed to L1_support.\n- KB used: billing/billing-and-plans#how-seat-billing-works.\n- Policy requires notify_tam=True due to At Risk health, Inactive usage, and competitor risk.\n- No escalation required.",
+  "confidence": 0.91,
+  "reasoning_trace": [
+    {
+      "step": 1,
+      "action": "find_account",
+      "input": "by='company_name', value='Omni Consumer Products'",
+      "observation": "Found account ACC-3336 (Omni Consumer Products), Business tier."
+    },
+    {
+      "step": 2,
+      "action": "get_account",
+      "input": "account_id='ACC-3336'",
+      "observation": "Account profile loaded: Business tier, At Risk health, Inactive usage, competitor evaluation note."
+    },
+    {
+      "step": 3,
+      "action": "search_kb",
+      "input": "query='DataBridge Pro invoice active users seat billing credit'",
+      "observation": "Found billing/billing-and-plans#how-seat-billing-works (current)."
+    }
+  ]
+}
