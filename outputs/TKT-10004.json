@@ -1,0 +1,45 @@
+{
+  "ticket_id": "TKT-10004",
+  "account_id": "ACC-8014",
+  "category": "security",
+  "priority": "P1",
+  "route_to": "security",
+  "escalate": true,
+  "notify_tam": true,
+  "duplicate_of": null,
+  "needs_clarification": false,
+  "kb_references": [
+    "troubleshooting/authentication-sso#salesforce-sso-configuration"
+  ],
+  "account_signals": [
+    "Plan: Professional",
+    "Health: Healthy",
+    "Usage: Declining",
+    "Renewal: 2026-11-11",
+    "TAM: Fatima Al-Rashid",
+    "308 users blocked from authentication"
+  ],
+  "customer_reply": "Hi,\n\nThank you for reaching out with urgency. With 308 new team members blocked from authenticating into CloudSync via Salesforce SSO, we have escalated this ticket to our Security and Identity Engineering team with P1 priority.\n\nThe DEPENDENCY_UNAVAILABLE error typically indicates either a certificate mismatch or an unmapped user attribute profile on the Salesforce IDP SAML assertion for new user provisioning.\n\nOur security engineers are checking the SAML trace logs immediately and will provide an update shortly.\n\nBest regards,\nIdentity & Security Team",
+  "internal_note": "- Account: ACC-8014 (Acme Corp) – Professional tier, Declining usage trend.\n- Urgency: P1 escalation; 308 users blocked from authenticating (business stopped for new joiners).\n- Category: security, routed to security team.\n- Escalated due to P1 severity and widespread user lockout.\n- Policy requires notify_tam=True due to Declining usage trend.\n- KB reference: troubleshooting/authentication-sso#salesforce-sso-configuration.",
+  "confidence": 0.94,
+  "reasoning_trace": [
+    {
+      "step": 1,
+      "action": "find_account",
+      "input": "find_account(by='company_name', value='Acme Corp')",
+      "observation": "{\"found\": true, \"account_id\": \"ACC-8014\", \"company\": \"Acme Corp\", \"plan_tier\": \"Professional\"}"
+    },
+    {
+      "step": 2,
+      "action": "get_account",
+      "input": "get_account(account_id='ACC-8014')",
+      "observation": "{\"account_id\": \"ACC-8014\", \"company\": \"Acme Corp\", \"tam\": \"Fatima Al-Rashid\", \"plan_tier\": \"Professional\", \"health_status\": \"Healthy\", \"usage_trend\": \"Declining\"}"
+    },
+    {
+      "step": 3,
+      "action": "search_kb",
+      "input": "search_kb(query='CloudSync SSO Salesforce DEPENDENCY_UNAVAILABLE new users')",
+      "observation": "Retrieved troubleshooting/authentication-sso#salesforce-sso-configuration."
+    }
+  ]
+}

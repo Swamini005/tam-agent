@@ -1,0 +1,44 @@
+{
+  "ticket_id": "TKT-10003",
+  "account_id": "ACC-1785",
+  "category": "bug",
+  "priority": "P2",
+  "route_to": "L2_engineering",
+  "escalate": false,
+  "notify_tam": true,
+  "duplicate_of": null,
+  "needs_clarification": false,
+  "kb_references": [
+    "products/securevault#authentication"
+  ],
+  "account_signals": [
+    "Plan: Starter",
+    "Health: At Risk",
+    "Usage: Stable",
+    "Renewal: 2027-05-18",
+    "TAM: Fatima Al-Rashid"
+  ],
+  "customer_reply": "Hi,\n\nThank you for reaching out. The CHECKSUM_MISMATCH error on chunk 47 when attempting to update permissions in SecureVault indicates a corrupted permission validation state following the recent software update.\n\nOur engineering team is actively investigating this backend validation failure. We have prioritized this ticket and will update you as soon as a fix or database patch is applied to restore your permission management access.\n\nBest regards,\nSecureVault Engineering Support",
+  "internal_note": "- Account: ACC-1785 (Cyberdyne Systems) – Starter tier, At Risk health status.\n- Issue: CHECKSUM_MISMATCH data integrity error on chunk 47 in SecureVault Authentication module.\n- High-impact permission management failure across all users; classified as bug, P2, routed to L2_engineering.\n- Policy requires notify_tam=True due to At Risk health status.\n- KB references: products/securevault#authentication.",
+  "confidence": 0.91,
+  "reasoning_trace": [
+    {
+      "step": 1,
+      "action": "find_account",
+      "input": "find_account(by='company_name', value='Cyberdyne Systems')",
+      "observation": "{\"found\": true, \"account_id\": \"ACC-1785\", \"company\": \"Cyberdyne Systems\", \"plan_tier\": \"Starter\"}"
+    },
+    {
+      "step": 2,
+      "action": "get_account",
+      "input": "get_account(account_id='ACC-1785')",
+      "observation": "{\"account_id\": \"ACC-1785\", \"company\": \"Cyberdyne Systems\", \"tam\": \"Fatima Al-Rashid\", \"plan_tier\": \"Starter\", \"health_status\": \"At Risk\", \"usage_trend\": \"Stable\"}"
+    },
+    {
+      "step": 3,
+      "action": "search_kb",
+      "input": "search_kb(query='SecureVault Authentication CHECKSUM_MISMATCH error')",
+      "observation": "Retrieved products/securevault#authentication."
+    }
+  ]
+}

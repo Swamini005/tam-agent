@@ -1,20 +1,16 @@
 import json
 import os
+import re
 import time
-
-from groq import BadRequestError, RateLimitError
+import httpx
 
 from tam_agent.schema import Decision
 from tam_agent.tools import TOOLS
 
-MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
-TOKEN_LIMIT = int(os.getenv("GROQ_TOKEN_LIMIT", "8000"))
 
-# Groq strict mode requires ALL properties listed in required.
-# Pydantic omits Optional / defaulted fields from required, so we patch the schema.
 def _strict_schema():
+    """Recursively enforce Groq strict-mode requirements."""
     schema = Decision.model_json_schema()
-    # Dereference any $defs so all types are inline
     defs = schema.pop("$defs", {})
 
     def deref(node):
@@ -29,23 +25,19 @@ def _strict_schema():
 
     schema = deref(schema)
 
-    # Allow null for Optional fields
     for field_name in ("account_id", "duplicate_of"):
         prop = schema.get("properties", {}).get(field_name, {})
         if "anyOf" not in prop:
             schema["properties"][field_name] = {"anyOf": [prop, {"type": "null"}]}
 
     def patch(node):
-        """Recursively enforce Groq strict-mode requirements on every object node."""
         if not isinstance(node, dict):
             return node
         node = {k: patch(v) for k, v in node.items()}
         if node.get("type") == "object" or "properties" in node:
-            # Every object must have required = all properties and additionalProperties: false
             node["additionalProperties"] = False
             if "properties" in node:
                 node["required"] = list(node["properties"].keys())
-        # Recurse into anyOf / allOf / oneOf / items
         for key in ("anyOf", "allOf", "oneOf"):
             if key in node:
                 node[key] = [patch(sub) for sub in node[key]]
@@ -53,17 +45,150 @@ def _strict_schema():
             node["items"] = patch(node["items"])
         return node
 
-    schema = patch(schema)
-    return schema
+    return patch(schema)
 
 
-class GroqChat:
-    def __init__(self, client, system, prompt):
+class GeminiClient:
+    """
+    Direct HTTP client for Google's OpenAI-compatible endpoint.
+    Eliminates SDK path-prefix bugs and prints exact server errors.
+    """
+    def __init__(self, api_key, model=None):
+        self.api_key = api_key
+        self.model = model or os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
+        self.url = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
+
+    @property
+    def chat(self):
+        return self
+
+    @property
+    def completions(self):
+        return self
+
+    def create(self, model=None, messages=None, tools=None, response_format=None, max_tokens=2000, max_completion_tokens=None, **kwargs):
+        req_model = model or self.model
+        tokens = max_tokens or max_completion_tokens or 2000
+        payload = {
+            "model": req_model,
+            "messages": messages or [],
+            "max_tokens": tokens,
+        }
+        if tools:
+            payload["tools"] = tools
+        if response_format:
+            payload["response_format"] = response_format
+
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+        }
+
+        with httpx.Client(timeout=60.0) as client:
+            resp = client.post(self.url, headers=headers, json=payload)
+            if resp.status_code != 200:
+                # If 404 on gemini-1.5-flash, auto-retry with gemini-2.0-flash
+                if resp.status_code == 404 and req_model == "gemini-1.5-flash":
+                    payload["model"] = "gemini-2.0-flash"
+                    resp2 = client.post(self.url, headers=headers, json=payload)
+                    if resp2.status_code == 200:
+                        self.model = "gemini-2.0-flash"
+                        resp = resp2
+                    else:
+                        raise RuntimeError(f"Gemini API error {resp.status_code}: {resp.text}")
+                else:
+                    raise RuntimeError(f"Gemini API error {resp.status_code}: {resp.text}")
+
+            data = resp.json()
+
+        class ToolCallFunc:
+            def __init__(self, name, arguments):
+                self.name = name
+                self.arguments = arguments if isinstance(arguments, str) else json.dumps(arguments)
+
+        class ToolCallItem:
+            def __init__(self, call_id, name, arguments):
+                self.id = call_id
+                self.type = "function"
+                self.function = ToolCallFunc(name, arguments)
+
+        class MessageItem:
+            def __init__(self, raw):
+                self.content = raw.get("content") or ""
+                tcs = raw.get("tool_calls")
+                if tcs:
+                    self.tool_calls = [
+                        ToolCallItem(
+                            tc.get("id", f"call_{i}"),
+                            tc.get("function", {}).get("name", ""),
+                            tc.get("function", {}).get("arguments", "{}")
+                        )
+                        for i, tc in enumerate(tcs)
+                    ]
+                else:
+                    self.tool_calls = None
+
+        class ChoiceItem:
+            def __init__(self, raw):
+                self.finish_reason = raw.get("finish_reason")
+                self.message = MessageItem(raw.get("message", {}))
+
+        class ResponseItem:
+            def __init__(self, raw):
+                self.choices = [ChoiceItem(c) for c in raw.get("choices", [])]
+
+        return ResponseItem(data)
+
+
+def get_client_and_config():
+    """
+    Auto-detects API key and returns (client, provider, model, token_limit).
+    Supports Gemini, Groq, and OpenAI.
+    """
+    gemini_key = os.getenv("GEMINI_API_KEY")
+    groq_key = os.getenv("GROQ_API_KEY")
+    openai_key = os.getenv("OPENAI_API_KEY")
+
+    if gemini_key:
+        provider = "gemini"
+        model = os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
+        token_limit = int(os.getenv("GEMINI_TOKEN_LIMIT", "1000000"))
+        client = GeminiClient(api_key=gemini_key, model=model)
+        return client, provider, model, token_limit
+
+    elif groq_key:
+        provider = "groq"
+        model = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
+        token_limit = int(os.getenv("GROQ_TOKEN_LIMIT", "8000"))
+        from groq import Groq
+        client = Groq(max_retries=10)
+        return client, provider, model, token_limit
+
+    elif openai_key:
+        provider = "openai"
+        model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+        token_limit = int(os.getenv("OPENAI_TOKEN_LIMIT", "128000"))
+        from openai import OpenAI
+        client = OpenAI(api_key=openai_key)
+        return client, provider, model, token_limit
+
+    else:
+        raise ValueError("No API key found. Set GEMINI_API_KEY or GROQ_API_KEY in .env.")
+
+
+class LLMChat:
+    def __init__(self, client, provider="groq", model=None, token_limit=None, system="", prompt=""):
         self.client = client
-        self.messages = [{"role": "system", "content": system}, {"role": "user", "content": prompt}]
+        self.provider = provider
+        self.model = model or ("gemini-1.5-flash" if provider == "gemini" else "openai/gpt-oss-120b")
+        self.token_limit = token_limit or (1000000 if provider == "gemini" else 8000)
+        self.messages = [
+            {"role": "system", "content": system},
+            {"role": "user", "content": prompt},
+        ]
 
     def _fit(self, extra_tokens):
-        budget = (TOKEN_LIMIT - extra_tokens) * 3
+        budget = (self.token_limit - extra_tokens) * 3
         while len(json.dumps(self.messages)) > budget:
             longest = max(
                 (m for m in self.messages if m["role"] == "tool"),
@@ -78,30 +203,32 @@ class GroqChat:
             )
 
     def _call(self, max_tokens, **kwargs):
-        """Call Groq, retrying on tool_use_failed and 429 rate-limit errors."""
-        wait = 30  # seconds to wait on first 429
+        wait = 15
         for attempt in range(8):
             try:
                 response = self.client.chat.completions.create(
-                    model=MODEL,
+                    model=self.model,
                     messages=self.messages,
-                    max_completion_tokens=max_tokens,
+                    max_tokens=max_tokens,
                     **kwargs,
                 )
                 break
-            except RateLimitError:
-                if attempt == 7:
-                    raise
-                print(f"  [rate-limit] waiting {wait}s before retry {attempt + 1}...")
-                time.sleep(wait)
-                wait = min(wait * 2, 120)  # exponential backoff, cap at 120s
-            except BadRequestError as exc:
-                if "tool_use_failed" not in str(exc) or attempt == 2:
+            except Exception as exc:
+                err_str = str(exc).lower()
+                if "rate" in err_str or "429" in err_str or "quota" in err_str:
+                    if attempt == 7:
+                        raise
+                    print(f"  [rate-limit] waiting {wait}s before retry {attempt + 1}...")
+                    time.sleep(wait)
+                    wait = min(wait * 2, 60)
+                elif "tool_use_failed" in err_str and attempt < 3:
+                    time.sleep(2)
+                else:
                     raise
 
         choice = response.choices[0]
         if choice.finish_reason == "length":
-            raise RuntimeError("Groq stopped early: max tokens")
+            raise RuntimeError("Model stopped early: max tokens")
         message = choice.message
         self.messages.append(
             {
@@ -146,18 +273,35 @@ class GroqChat:
         ]
 
     def final(self, instruction):
-        self.messages.append(
-            {
-                "role": "user",
-                "content": f"{instruction}\nDo not call any tools now; reply only with the JSON.",
-            }
+        schema = Decision.model_json_schema()
+        prompt_text = (
+            f"{instruction}\n"
+            f"You MUST output a valid JSON object matching this schema exactly:\n"
+            f"{json.dumps(schema, indent=2)}\n"
+            f"Do not call tools; reply ONLY with the JSON object."
         )
-        schema = _strict_schema()
-        self._fit(extra_tokens=3000 + len(json.dumps(schema)) // 3)
-        return self._call(
-            3000,
-            response_format={
-                "type": "json_schema",
-                "json_schema": {"name": "Decision", "schema": schema, "strict": True},
-            },
-        ).content
+        self.messages.append({"role": "user", "content": prompt_text})
+
+        if self.provider == "groq":
+            strict_schema = _strict_schema()
+            self._fit(extra_tokens=3000 + len(json.dumps(strict_schema)) // 3)
+            return self._call(
+                3000,
+                response_format={
+                    "type": "json_schema",
+                    "json_schema": {"name": "Decision", "schema": strict_schema, "strict": True},
+                },
+            ).content
+        else:
+            self._fit(extra_tokens=4000)
+            try:
+                return self._call(
+                    3000,
+                    response_format={"type": "json_object"},
+                ).content
+            except Exception:
+                return self._call(3000).content
+
+
+# Backward compatibility alias
+GroqChat = LLMChat

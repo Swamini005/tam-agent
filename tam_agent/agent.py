@@ -6,6 +6,12 @@ import re
 import sys
 from pathlib import Path
 
+from pydantic import ValidationError
+
+from tam_agent.llm import LLMChat, get_client_and_config
+from tam_agent.schema import CATEGORIES, PRIORITIES, ROUTES, Decision, TriageOutput, validate
+from tam_agent.tools import OPEN, Store, Tools
+
 try:
     from dotenv import load_dotenv
 except ImportError:
@@ -17,12 +23,6 @@ except ImportError:
                 if line and not line.startswith("#") and "=" in line:
                     k, v = line.split("=", 1)
                     os.environ.setdefault(k.strip(), v.strip().strip("'\""))
-from groq import Groq
-from pydantic import ValidationError
-
-from tam_agent.llm import GroqChat
-from tam_agent.schema import CATEGORIES, PRIORITIES, ROUTES, Decision, TriageOutput, validate
-from tam_agent.tools import OPEN, Store, Tools
 
 MAX_ROUNDS = 12
 HIDDEN_FIELDS = {"status", "assigned_agent", "satisfaction_score", "updated_at"}
@@ -86,17 +86,30 @@ def triage(ticket, ctx=None):
     if ctx is not None and hasattr(ctx, "client") and hasattr(ctx, "store"):
         client = ctx.client
         store = ctx.store
+        provider = getattr(ctx, "provider", "groq")
+        model = getattr(ctx, "model", None)
+        token_limit = getattr(ctx, "token_limit", None)
     elif isinstance(ctx, dict) and "client" in ctx and "store" in ctx:
         client = ctx["client"]
         store = ctx["store"]
+        provider = ctx.get("provider", "groq")
+        model = ctx.get("model", None)
+        token_limit = ctx.get("token_limit", None)
     else:
-        client = Groq(max_retries=10)
+        client, provider, model, token_limit = get_client_and_config()
         store = Store()
 
     tools = Tools(store, ticket)
     reasoning_trace = []
     visible = {k: v for k, v in ticket.items() if k not in HIDDEN_FIELDS}
-    chat = GroqChat(client, SYSTEM_PROMPT, f"Triage this ticket:\n\n{json.dumps(visible, indent=2)}")
+    chat = LLMChat(
+        client=client,
+        provider=provider,
+        model=model,
+        token_limit=token_limit,
+        system=SYSTEM_PROMPT,
+        prompt=f"Triage this ticket:\n\n{json.dumps(visible, indent=2)}",
+    )
 
     for _ in range(MAX_ROUNDS):
         calls = chat.turn()
@@ -132,7 +145,10 @@ def triage(ticket, ctx=None):
 
     for _ in range(2):
         try:
-            raw_json = chat.final(instruction)
+            raw_json = chat.final(instruction).strip()
+            if raw_json.startswith("```"):
+                raw_json = re.sub(r"^```(?:json)?\s*", "", raw_json)
+                raw_json = re.sub(r"\s*```$", "", raw_json)
             decision = Decision.model_validate_json(raw_json)
             output_dict = build_output_dict(ticket, decision, tools, reasoning_trace)
             problems = check(output_dict, tools)
@@ -237,6 +253,7 @@ def main():
     parser.add_argument("ticket_ids", nargs="*", help="ticket IDs, e.g. TKT-10042")
     parser.add_argument("--sample", type=int, help="triage N random tickets")
     parser.add_argument("--set", choices=["review"], help="run review set")
+    parser.add_argument("--skip-existing", action="store_true", help="skip tickets that already have output JSON")
     parser.add_argument("--data", default="data")
     parser.add_argument("--kb", default="knowledge-base")
     parser.add_argument("--out", default="outputs")
@@ -245,12 +262,20 @@ def main():
     if not args.ticket_ids and not args.sample and not args.set:
         parser.error("give ticket IDs, --sample N, or --set review")
 
-    if not os.getenv("GROQ_API_KEY"):
-        sys.exit("Set GROQ_API_KEY in .env.")
+    try:
+        client, provider, model, token_limit = get_client_and_config()
+    except Exception as exc:
+        sys.exit(f"LLM Configuration Error: {exc}")
 
+    print(f"[*] Initialized LLM: {provider.upper()} (Model: {model})")
     store = Store(args.data, args.kb)
-    client = Groq(max_retries=10)
-    ctx = {"client": client, "store": store}
+    ctx = {
+        "client": client,
+        "store": store,
+        "provider": provider,
+        "model": model,
+        "token_limit": token_limit,
+    }
     Path(args.out).mkdir(exist_ok=True)
 
     if args.set == "review":
@@ -273,13 +298,18 @@ def main():
         if ticket is None:
             print(f"{ticket_id}: not found in tickets.json")
             continue
+
+        path = Path(args.out, f"{ticket_id}.json")
+        if args.skip_existing and path.exists():
+            print(f"{ticket_id}: already processed ({path}), skipping")
+            continue
+
         try:
             result = triage(ticket, ctx)
         except Exception as exc:
             print(f"{ticket_id}: failed - {exc}")
             continue
 
-        path = Path(args.out, f"{ticket_id}.json")
         path.write_text(json.dumps(result, indent=2), encoding="utf-8")
 
         with run_log_path.open("a", encoding="utf-8") as f:

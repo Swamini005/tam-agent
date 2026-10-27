@@ -5,3 +5,6 @@
 {"ticket_id": "TKT-10432", "status": "success", "category": "feature_request", "priority": "P4"}
 {"ticket_id": "TKT-10455", "status": "success", "category": "how_to", "priority": "P4"}
 {"ticket_id": "TKT-10000", "status": "success", "category": "feature_request", "priority": "P4"}
+{"ticket_id": "TKT-10003", "status": "success", "category": "bug", "priority": "P2"}
+{"ticket_id": "TKT-10004", "status": "success", "category": "security", "priority": "P1"}
+{"ticket_id": "TKT-10009", "status": "success", "category": "how_to", "priority": "P4"}
