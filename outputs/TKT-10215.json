@@ -9,42 +9,91 @@
   "duplicate_of": null,
   "needs_clarification": false,
   "kb_references": [
-    "products/analyticshub#pricing--limits-by-plan"
+    "products/analyticshub#pricing--limits-by-plan",
+    "troubleshooting/performance-and-integrations#error-reference"
   ],
   "account_signals": [
-    "Plan tier: Enterprise",
-    "Health status: New",
-    "Usage trend: Increasing",
-    "Renewal: 2026-12-25",
-    "TAM: Yuki Tanaka"
+    "Plan: Enterprise",
+    "Health: New",
+    "Usage: Increasing",
+    "Open tickets: 5",
+    "Renewal in 247 days"
   ],
-  "customer_reply": "Hi,\n\nThanks for reaching out. The QUOTA_EXCEEDED error indicates that your organization has reached the storage allocation for AnalyticsHub on your current plan.\n\nAccording to our documentation, you have two immediate options:\n1. Free up space – Delete or archive older datasets that are no longer actively queried.\n2. Increase quota – We can submit a quota-increase request to your account team.\n\nPlease let us know if you would like us to initiate a quota adjustment or assist with identifying large datasets to archive.\n\nBest regards,\nCustomer Support",
-  "internal_note": "- Account: ACC-7893 (Solaris Data) – Enterprise plan, New health, usage increasing.\n- Issue is storage limit guidance (QUOTA_EXCEEDED), routed to L1_support.\n- KB used: products/analyticshub#pricing--limits-by-plan.\n- No duplicate tickets in last 90 days.\n- No TAM notification or escalation needed.",
-  "confidence": 0.92,
+  "customer_reply": "Hi,\n\nThanks for reaching out. The \"QUOTA_EXCEEDED: storage limit reached\" message means your AnalyticsHub storage allocation for the current plan has been exhausted. To restore access to the Dashboard you can either:\n1. Delete or archive unused data to free up space, or\n2. Increase your storage quota by upgrading your plan or purchasing additional storage.\n\nPlease refer to our Storage Limits guide (https://kb.company.com/products/analyticshub#pricing--limits-by-plan) for the exact limits per plan and the steps to request more capacity. Let us know which option you\u2019d like to pursue, and we\u2019ll be happy to help with the cleanup or the upgrade process.\n\nBest regards,\nSupport Team",
+  "internal_note": "- Account: ACC-7893 (Solaris Data), Enterprise plan\n- Health: New, usage increasing, no churn signals\n- Issue: Storage quota exceeded on AnalyticsHub Dashboard after update\n- Likely cause: Storage allocation reached limit for current plan\n- KB used: products/analyticshub#pricing--limits-by-plan, troubleshooting/performance-and-integrations#error-reference\n- Action: Advise customer to free up space or upgrade storage; L1 can handle\n- No escalation or TAM notification required",
+  "confidence": 0.95,
   "reasoning_trace": [
     {
       "step": 1,
       "action": "find_account",
-      "input": "by='account_id', value='ACC-2999'",
-      "observation": "account_id ACC-2999 not found."
+      "input": "find_account(by='account_id', value='ACC-2999') - Verify account details for ticket TKT-10215",
+      "observation": "{\"found\": false, \"note\": \"No account matches account_id='ACC-2999'. Try another key.\"}"
     },
     {
       "step": 2,
       "action": "find_account",
-      "input": "by='company_name', value='Solaris Data'",
-      "observation": "Found account ACC-7893 (Solaris Data), Enterprise plan."
+      "input": "find_account(by='company_name', value='Solaris Data') - Find account for Solaris Data since account_id missing",
+      "observation": "{\"found\": true, \"account_id\": \"ACC-7893\", \"company\": \"Solaris Data\", \"plan_tier\": \"Enterprise\"}"
     },
     {
       "step": 3,
       "action": "get_account",
-      "input": "account_id='ACC-7893'",
-      "observation": "Account profile loaded: Enterprise tier, New health, renewal in >180 days."
+      "input": "get_account(account_id='ACC-7893') - Get full profile for triage",
+      "observation": "{\"account_id\": \"ACC-7893\", \"company\": \"Solaris Data\", \"tam\": \"Yuki Tanaka\", \"plan_tier\": \"Enterprise\", \"arr_usd\": 24000, \"seats_licensed\": 1314, \"seats_active\": 757, \"products\": [\"AnalyticsHub\", \"SecureVault\", \"DataBridge Pro\", \"CloudSync\"], \"health_status\": \"New\", \"usage_trend\": \"Increasing\", \"open..."
     },
     {
       "step": 4,
       "action": "search_kb",
-      "input": "query='AnalyticsHub QUOTA_EXCEEDED storage limit increase'",
-      "observation": "Found products/analyticshub#pricing--limits-by-plan."
+      "input": "search_kb(query='AnalyticsHub storage quota exceeded dashboard') - Find KB article for storage limit reached error",
+      "observation": "{\"results\": [{\"id\": \"products/analyticshub#dashboard\", \"heading\": \"Dashboard\", \"status\": \"current\", \"evidence\": null, \"replaced_by\": null, \"snippet\": \"### Dashboard\\n\\nInteractive visualisation canvas. Supports charts (line, bar, scatter, pie, heatmap), KPI tiles, data tables, and embedded SQL views..."
+    },
+    {
+      "step": 5,
+      "action": "search_kb",
+      "input": "search_kb(query='quota exceeded storage limit analytics hub') - Find KB about storage quota",
+      "observation": "{\"results\": [{\"id\": \"products/analyticshub#pricing--limits-by-plan\", \"heading\": \"Pricing & Limits by Plan\", \"status\": \"current\", \"evidence\": null, \"replaced_by\": null, \"snippet\": \"## Pricing & Limits by Plan\\n\\n| Feature | Starter | Professional | Business | Enterprise |\\n|---------|---------|------..."
+    },
+    {
+      "step": 6,
+      "action": "search_kb",
+      "input": "search_kb(query='AnalyticsHub storage quota limit exceeded error QUOTA_EXCEEDED') - Find KB article on storage quota",
+      "observation": "{\"results\": [{\"id\": \"troubleshooting/performance-and-integrations#error-reference\", \"heading\": \"Error Reference\", \"status\": \"current\", \"evidence\": null, \"replaced_by\": null, \"snippet\": \"## Error Reference\\n\\n| Error | Likely Cause | Resolution |\\n|-------|-------------|------------|\\n| `ERR_CONNECTI..."
+    },
+    {
+      "step": 7,
+      "action": "search_kb",
+      "input": "search_kb(query='AnalyticsHub storage limit reached QUOTA_EXCEEDED') - Find relevant KB article",
+      "observation": "{\"results\": [{\"id\": \"products/analyticshub#pricing--limits-by-plan\", \"heading\": \"Pricing & Limits by Plan\", \"status\": \"current\", \"evidence\": null, \"replaced_by\": null, \"snippet\": \"## Pricing & Limits by Plan\\n\\n| Feature | Starter | Professional | Business | Enterprise |\\n|---------|---------|------..."
+    },
+    {
+      "step": 8,
+      "action": "search_kb",
+      "input": "search_kb(query='AnalyticsHub storage quota exceeded limit') - Find KB article about storage quota in AnalyticsHub",
+      "observation": "{\"results\": [{\"id\": \"products/analyticshub#pricing--limits-by-plan\", \"heading\": \"Pricing & Limits by Plan\", \"status\": \"current\", \"evidence\": null, \"replaced_by\": null, \"snippet\": \"## Pricing & Limits by Plan\\n\\n| Feature | Starter | Professional | Business | Enterprise |\\n|---------|---------|------..."
+    },
+    {
+      "step": 9,
+      "action": "search_kb",
+      "input": "search_kb(query='storage quota exceeded analytics hub storage limit') - Find KB about storage quota exceeded",
+      "observation": "{\"results\": [{\"id\": \"products/analyticshub#pricing--limits-by-plan\", \"heading\": \"Pricing & Limits by Plan\", \"status\": \"current\", \"evidence\": null, \"replaced_by\": null, \"snippet\": \"## Pricing & Limits by Plan\\n\\n| Feature | Starter | Professional | Business | Enterprise |\\n|---------|---------|------..."
+    },
+    {
+      "step": 10,
+      "action": "search_kb",
+      "input": "search_kb(query='AnalyticsHub storage quota usage limit') - Find KB about storage usage limits",
+      "observation": "{\"results\": [{\"id\": \"products/analyticshub#pricing--limits-by-plan\", \"heading\": \"Pricing & Limits by Plan\", \"status\": \"current\", \"evidence\": null, \"replaced_by\": null, \"snippet\": \"## Pricing & Limits by Plan\\n\\n| Feature | Starter | Professional | Business | Enterprise |\\n|---------|---------|------..."
+    },
+    {
+      "step": 11,
+      "action": "search_kb",
+      "input": "search_kb(query='storage limit reached AnalyticsHub') - Find KB about storage limit reached error",
+      "observation": "{\"results\": [{\"id\": \"products/analyticshub#pricing--limits-by-plan\", \"heading\": \"Pricing & Limits by Plan\", \"status\": \"current\", \"evidence\": null, \"replaced_by\": null, \"snippet\": \"## Pricing & Limits by Plan\\n\\n| Feature | Starter | Professional | Business | Enterprise |\\n|---------|---------|------..."
+    },
+    {
+      "step": 12,
+      "action": "search_kb",
+      "input": "search_kb(query='storage quota limit analytics hub storage quota exceeded') - Find KB about storage quota limits in AnalyticsHub",
+      "observation": "{\"results\": [{\"id\": \"products/analyticshub#pricing--limits-by-plan\", \"heading\": \"Pricing & Limits by Plan\", \"status\": \"current\", \"evidence\": null, \"replaced_by\": null, \"snippet\": \"## Pricing & Limits by Plan\\n\\n| Feature | Starter | Professional | Business | Enterprise |\\n|---------|---------|------..."
     }
   ]
 }

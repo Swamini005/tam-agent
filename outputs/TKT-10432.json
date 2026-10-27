@@ -7,38 +7,90 @@
   "escalate": false,
   "notify_tam": true,
   "duplicate_of": null,
-  "needs_clarification": true,
-  "kb_references": [
-    "products/databridge-pro#connectors"
-  ],
+  "needs_clarification": false,
+  "kb_references": [],
   "account_signals": [
-    "Plan tier: Professional",
-    "Health status: Healthy",
-    "Usage trend: Declining",
-    "Renewal in 120 days",
-    "TAM: Lucas Ferreira"
+    "Plan: Professional",
+    "Health: Healthy",
+    "Usage Trend: Declining",
+    "Open Tickets: 7",
+    "Renewal in 120 days"
   ],
-  "customer_reply": "Hi Casey,\n\nThank you for reaching out with this suggestion. A native capability to export Connectors data directly to BigQuery sounds like a valuable addition.\n\nI have submitted this request directly to our Product Management team for roadmap review. To help us build out the user story and gauge priority, could you provide a bit more context?\n\n1. How many connectors or pipelines would you anticipate exporting to BigQuery?\n2. What is your estimated export volume (rows/GB) per run?\n3. Do you require specific partitioning or schema formatting in BigQuery?\n\nWe will update you as this request progresses through product review.\n\nBest regards,\nProduct Support",
-  "internal_note": "- Account: ACC-8588 (Prestige Worldwide) – Professional tier, Healthy health, but usage trend is Declining.\n- Feature request for BigQuery connector export: priority P4, routed to product.\n- Policy requires notify_tam=True due to Declining usage trend.\n- No duplicate tickets in last 90 days.\n- KB references: products/databridge-pro#connectors.",
-  "confidence": 0.94,
+  "customer_reply": "Hi,\n\nThank you for sharing your idea to add a native export from Connectors to BigQuery. We\u2019ve logged this as a feature request and will forward it to our product team for roadmap consideration. You\u2019ll receive updates as we evaluate its priority. If there\u2019s any additional detail you\u2019d like to provide (e.g., specific data volumes or scheduling needs), please let us know.\n\nThanks for helping us improve the product!",
+  "internal_note": "- Account ACC-8588, Professional tier, Healthy, Usage declining\n- Feature request: Connectors \u2192 BigQuery export\n- No duplicate found in last 90 days\n- Route to product team (P4)\n- Notify TAM (usage declining)\n- No KB article specific to feature request found",
+  "confidence": 0.96,
   "reasoning_trace": [
     {
       "step": 1,
       "action": "find_account",
-      "input": "by='company_name', value='Prestige Worldwide'",
-      "observation": "Found account ACC-8588 (Prestige Worldwide), Professional plan."
+      "input": "find_account(by='account_id', value='ACC-8941') - Verify account details for ticket TKT-10432",
+      "observation": "{\"found\": false, \"note\": \"No account matches account_id='ACC-8941'. Try another key.\"}"
     },
     {
       "step": 2,
-      "action": "get_account",
-      "input": "account_id='ACC-8588'",
-      "observation": "Account profile loaded: Professional tier, Healthy, usage trend Declining, TAM Lucas Ferreira."
+      "action": "find_account",
+      "input": "find_account(by='company_name', value='Prestige Worldwide') - Find account for Prestige Worldwide",
+      "observation": "{\"found\": true, \"account_id\": \"ACC-8588\", \"company\": \"Prestige Worldwide\", \"plan_tier\": \"Professional\"}"
     },
     {
       "step": 3,
+      "action": "get_account",
+      "input": "get_account(account_id='ACC-8588') - Get full account details for ticket triage",
+      "observation": "{\"account_id\": \"ACC-8588\", \"company\": \"Prestige Worldwide\", \"tam\": \"Lucas Ferreira\", \"plan_tier\": \"Professional\", \"arr_usd\": 48000, \"seats_licensed\": 1621, \"seats_active\": 901, \"products\": [\"DataBridge Pro\", \"CloudSync\", \"SecureVault\"], \"health_status\": \"Healthy\", \"usage_trend\": \"Declining\", \"open_t..."
+    },
+    {
+      "step": 4,
+      "action": "get_ticket_history",
+      "input": "get_ticket_history(account_id='ACC-8588', days=90) - Check for duplicate feature request tickets for Prestige Worldwide",
+      "observation": "{\"window_days\": 90, \"tickets\": [{\"ticket_id\": \"TKT-10485\", \"created_at\": \"2026-03-24T02:00:32.204473Z\", \"subject\": \"Dashboard loading times unacceptable \\u2014 DataBridge Pro\", \"product\": \"DataBridge Pro\", \"product_area\": \"Data Ingestion\", \"category\": \"Feature Request\", \"urgency\": \"P2\", \"status\": \"C..."
+    },
+    {
+      "step": 5,
       "action": "search_kb",
-      "input": "query='DataBridge Pro export Connectors to BigQuery feature'",
-      "observation": "No native BigQuery export found; confirmed this is an unreleased capability."
+      "input": "search_kb(query='how to submit feature request product DataBridge Pro') - Find KB article to reference for feature request handling",
+      "observation": "{\"results\": [{\"id\": \"onboarding/onboarding-guide#step-3-product-configuration-days-25\", \"heading\": \"Step 3: Product configuration (Days 2\\u20135)\", \"status\": \"current\", \"evidence\": null, \"replaced_by\": null, \"snippet\": \"### Step 3: Product configuration (Days 2\\u20135)\\n\\nRefer to the relevant produ..."
+    },
+    {
+      "step": 6,
+      "action": "search_kb",
+      "input": "search_kb(query='feature request process product roadmap submit request') - Find KB article for handling feature request",
+      "observation": "{\"results\": [{\"id\": \"onboarding/onboarding-guide#step-3-product-configuration-days-25\", \"heading\": \"Step 3: Product configuration (Days 2\\u20135)\", \"status\": \"current\", \"evidence\": null, \"replaced_by\": null, \"snippet\": \"### Step 3: Product configuration (Days 2\\u20135)\\n\\nRefer to the relevant produ..."
+    },
+    {
+      "step": 7,
+      "action": "search_kb",
+      "input": "search_kb(query='feature request process') - Find KB article for feature request submission",
+      "observation": "{\"results\": [{\"id\": \"products/databridge-pro#pipeline-stopped-processing\", \"heading\": \"Pipeline stopped processing\", \"status\": \"current\", \"evidence\": null, \"replaced_by\": null, \"snippet\": \"### Pipeline stopped processing\\n\\n1. Check Pipeline Monitoring dashboard for last heartbeat.\\n2. Review error ..."
+    },
+    {
+      "step": 8,
+      "action": "search_kb",
+      "input": "search_kb(query='feature request guidelines product roadmap') - Find KB article for feature request handling",
+      "observation": "{\"results\": [{\"id\": \"onboarding/onboarding-guide#step-3-product-configuration-days-25\", \"heading\": \"Step 3: Product configuration (Days 2\\u20135)\", \"status\": \"current\", \"evidence\": null, \"replaced_by\": null, \"snippet\": \"### Step 3: Product configuration (Days 2\\u20135)\\n\\nRefer to the relevant produ..."
+    },
+    {
+      "step": 9,
+      "action": "search_kb",
+      "input": "search_kb(query='submit a feature request') - Find KB article for how customers submit feature requests",
+      "observation": "{\"results\": [{\"id\": \"billing/billing-and-plans#common-billing-faqs\", \"heading\": \"Common Billing FAQs\", \"status\": \"current\", \"evidence\": null, \"replaced_by\": null, \"snippet\": \"## Common Billing FAQs\\n\\n**Q: Can I get a credit for service downtime?**  \\nA: Yes, for incidents breaching the plan's SLA u..."
+    },
+    {
+      "step": 10,
+      "action": "search_kb",
+      "input": "search_kb(query='feature request submission process product management') - Find KB article for submitting feature requests",
+      "observation": "{\"results\": [{\"id\": \"onboarding/onboarding-guide#step-3-product-configuration-days-25\", \"heading\": \"Step 3: Product configuration (Days 2\\u20135)\", \"status\": \"current\", \"evidence\": null, \"replaced_by\": null, \"snippet\": \"### Step 3: Product configuration (Days 2\\u20135)\\n\\nRefer to the relevant produ..."
+    },
+    {
+      "step": 11,
+      "action": "search_kb",
+      "input": "search_kb(query='how to request a new feature') - Locate KB article for feature request process",
+      "observation": "{\"results\": [{\"id\": \"troubleshooting/authentication-sso#new-users-cannot-authenticate-via-sso\", \"heading\": \"New Users Cannot Authenticate via SSO\", \"status\": \"current\", \"evidence\": null, \"replaced_by\": null, \"snippet\": \"## New Users Cannot Authenticate via SSO\\n\\n**Symptom:** Existing users log in f..."
+    },
+    {
+      "step": 12,
+      "action": "get_account",
+      "input": "get_account(account_id='ACC-8588') - Need renewal date and usage trend for triage",
+      "observation": "{\"account_id\": \"ACC-8588\", \"company\": \"Prestige Worldwide\", \"tam\": \"Lucas Ferreira\", \"plan_tier\": \"Professional\", \"arr_usd\": 48000, \"seats_licensed\": 1621, \"seats_active\": 901, \"products\": [\"DataBridge Pro\", \"CloudSync\", \"SecureVault\"], \"health_status\": \"Healthy\", \"usage_trend\": \"Declining\", \"open_t..."
     }
   ]
 }

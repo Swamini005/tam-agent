@@ -1,7 +1,7 @@
 {
   "ticket_id": "TKT-10293",
   "account_id": "ACC-7397",
-  "category": "bug",
+  "category": "incident",
   "priority": "P2",
   "route_to": "L2_engineering",
   "escalate": false,
@@ -9,45 +9,47 @@
   "duplicate_of": null,
   "needs_clarification": true,
   "kb_references": [
-    "products/databridge-pro#api",
-    "troubleshooting/performance-and-integrations#step-1--identify-where-the-slowness-is"
+    "products/databridge-pro#api"
   ],
   "account_signals": [
-    "Plan tier: Starter",
-    "Health status: At Risk",
-    "Usage trend: Stable",
+    "Plan: Starter",
+    "Health: At Risk",
     "Renewal in 71 days",
-    "TAM: Yuki Tanaka",
-    "Negative sentiment detected in recent support tickets",
-    "3 consecutive P1 tickets in the last 30 days"
+    "Usage: Stable"
   ],
-  "customer_reply": "Hi Avery,\n\nThank you for reaching out. I am sorry to hear that DataBridge Pro is running slowly for your team.\n\nTo help us diagnose and isolate the problem quickly, could you please provide:\n\n1. Scope of the slowdown – is it impacting the web UI, API operations, or pipeline execution?\n2. Any specific error codes or HTTP response statuses (e.g. 504 timeouts)?\n3. Have any configuration or source schema changes been made in the last 14 days?\n4. Are specific pipelines impacted, or all workloads across the board?\n5. Are your teams connecting through a corporate VPN or proxy?\n\nOnce we have these details, we will immediately correlate them with platform metrics and engage engineering.\n\nBest regards,\nSupport Engineering",
-  "internal_note": "- Account: ACC-7397 (Gavin Belson Co) – Starter tier (ticket incorrectly marked Business).\n- Health is At Risk with renewal in 71 days (within 90-day window) -> notify TAM Yuki Tanaka.\n- Issue is widespread performance slowness; P2 routed to L2_engineering.\n- Escalation history shows 3 P1s in last 30 days; handle with high priority.\n- No duplicate tickets found for DataBridge Pro slowness.",
-  "confidence": 0.86,
+  "customer_reply": "Hi Avery,\n\nThank you for reaching out. I\u2019m sorry to hear you\u2019re experiencing such slow performance with DataBridge\u202fPro.\n\nTo help us diagnose the issue quickly, could you please provide the following information?\n\n1. The specific pipelines or API endpoints that are most affected (e.g., `/v3/records`, `/v3/ingest`).\n2. Any recent configuration changes or deployments made in the last two weeks (new source connectors, batch size adjustments, etc.).\n3. Screenshots or timestamps from the **Monitoring\u202f\u2192\u202fPipelines** throughput graph showing when the slowdown began.\n4. Whether the slowdown is observed across all EU\u2011West users or only a subset of them.\n\nIn the meantime, you can start the standard troubleshooting steps outlined in our KB article \u201cDataBridge\u202fPro: Pipeline Throughput Degradation.\u201d It walks you through checking the throughput graph, identifying common causes (source API latency, high concurrency, etc.), and applying quick mitigations.\n\nOnce we have the details above, we\u2019ll be able to pinpoint the root cause and work on a resolution.\n\nThanks for your cooperation.\n\nBest regards,\nSupport Team",
+  "internal_note": "- Account ACC-7397 (Gavin Belson Co) \u2013 Starter plan, health At Risk, renewal in 71 days \u2192 notify TAM.\n- Issue: severe performance degradation (119\u202fs page loads, API timeouts) affecting ~198 users in EU-West.\n- Category/Priority: Incident / P2.\n- Route to L2 Engineering for performance analysis.\n- No duplicate tickets found in last 90 days.\n- KB reference: products/databridge-pro#api.\n- Await clarification on affected pipelines, recent config changes, and monitoring screenshots.",
+  "confidence": 0.94,
   "reasoning_trace": [
     {
       "step": 1,
       "action": "find_account",
-      "input": "by='account_id', value='ACC-3336'",
-      "observation": "Account ACC-3336 belongs to Omni Consumer Products; ticket is from Gavin Belson Co. Mismatch."
+      "input": "find_account(by='account_id', value='ACC-3336') - Verify ticket account matches company",
+      "observation": "{\"found\": true, \"account_id\": \"ACC-3336\", \"company\": \"Omni Consumer Products\", \"plan_tier\": \"Business\", \"warning\": \"This account is Omni Consumer Products, but the ticket is from Gavin Belson Co. Probably the wrong account; look it up by company name.\"}"
     },
     {
       "step": 2,
       "action": "find_account",
-      "input": "by='company_name', value='Gavin Belson Co'",
-      "observation": "Found account ACC-7397 (Gavin Belson Co), Starter tier."
+      "input": "find_account(by='company_name', value='Gavin Belson Co') - Find correct account for Gavin Belson Co",
+      "observation": "{\"found\": true, \"account_id\": \"ACC-7397\", \"company\": \"Gavin Belson Co\", \"plan_tier\": \"Starter\"}"
     },
     {
       "step": 3,
       "action": "get_account",
-      "input": "account_id='ACC-7397'",
-      "observation": "Account is At Risk, renewal date 2026-07-30 (71 days), negative sentiment, 3 recent P1s."
+      "input": "get_account(account_id='ACC-7397') - Get details for triage (plan tier, health, renewal, usage)",
+      "observation": "{\"account_id\": \"ACC-7397\", \"company\": \"Gavin Belson Co\", \"tam\": \"Yuki Tanaka\", \"plan_tier\": \"Starter\", \"arr_usd\": 96000, \"seats_licensed\": 1483, \"seats_active\": 1355, \"products\": [\"CloudSync\", \"WorkflowEngine\", \"DataBridge Pro\", \"SecureVault\"], \"health_status\": \"At Risk\", \"usage_trend\": \"Stable\", \"o..."
     },
     {
       "step": 4,
+      "action": "get_ticket_history",
+      "input": "get_ticket_history(account_id='ACC-7397', days=90) - Check for duplicate performance issues",
+      "observation": "{\"window_days\": 90, \"tickets\": [{\"ticket_id\": \"TKT-10121\", \"created_at\": \"2026-04-11T22:31:32.190062Z\", \"subject\": \"Error when accessing Scheduling in WorkflowEngine\", \"product\": \"WorkflowEngine\", \"product_area\": \"Scheduling\", \"category\": \"Onboarding\", \"urgency\": \"P4\", \"status\": \"In Progress\"}, {\"ti..."
+    },
+    {
+      "step": 5,
       "action": "search_kb",
-      "input": "query='DataBridge Pro running extremely slowly troubleshooting'",
-      "observation": "Found troubleshooting/performance-and-integrations#step-1--identify-where-the-slowness-is and products/databridge-pro#api."
+      "input": "search_kb(query='DataBridge Pro performance slowdown API timeout EU-West') - Find KB article for performance issues",
+      "observation": "{\"results\": [{\"id\": \"products/databridge-pro#api\", \"heading\": \"API\", \"status\": \"current\", \"evidence\": null, \"replaced_by\": null, \"snippet\": \"### API\\n\\nFull REST API available at `https://api.databridge.yourdomain.com/v3/`.\\n\\n- Authentication: Bearer token (API key from Settings \\u2192 API Keys)\\n-..."
     }
   ]
 }

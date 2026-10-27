@@ -7,40 +7,51 @@
   "escalate": false,
   "notify_tam": true,
   "duplicate_of": null,
-  "needs_clarification": true,
+  "needs_clarification": false,
   "kb_references": [
     "billing/billing-and-plans#how-seat-billing-works"
   ],
   "account_signals": [
-    "Plan tier: Business",
-    "Health status: At Risk",
-    "Usage trend: Inactive",
-    "Renewal: 2026-08-19",
-    "TAM: Rohan Mehta",
-    "3 consecutive P1 tickets in the last 30 days",
-    "Decision maker considering competing vendor evaluation"
+    "Plan: Business",
+    "Health: At Risk",
+    "Usage: Inactive",
+    "Renewal in 146 days",
+    "Open tickets: 7",
+    "Escalation notes: competitor evaluation"
   ],
-  "customer_reply": "Hi Quinn,\n\nThank you for reaching out regarding invoice #60685.\n\nPer our billing policy, a licensed seat is tallied for any user who was active (logged in or invoked API resources) during the billing month. User deactivations take effect at the start of the next billing cycle, which is why your active count today may differ from the total billed seats for that period.\n\nTo ensure our finance team can review your invoice accurately, could you please provide:\n\n1. A list or export (CSV) of user accounts or emails you believe were incorrectly billed.\n2. The specific billing month in question.\n\nOnce we receive this information, we will audit the activity logs and review eligibility for an account credit.\n\nBest regards,\nBilling Support",
-  "internal_note": "- Account: ACC-3336 (Omni Consumer Products) – Business tier, At Risk health, Inactive usage.\n- Escalation notes show competitor evaluation and recent P1s.\n- Ticket category: how_to / billing inquiry, priority P4, routed to L1_support.\n- KB used: billing/billing-and-plans#how-seat-billing-works.\n- Policy requires notify_tam=True due to At Risk health, Inactive usage, and competitor risk.\n- No escalation required.",
-  "confidence": 0.91,
+  "customer_reply": "Hi Quinn,\n\nThanks for reaching out about Invoice #60685. I\u2019m happy to clarify how seat billing works for DataBridge Pro.\n\n1. **What counts as a seat?**\n   A seat is any user account that was active (logged in or made an API call) at least once during the billing month. Seats are tallied at the end of the month.\n\n2. **Why were we billed for 298 seats?**\n   The invoice reflects the total number of seats that were active at any point in the billing period. Even if a user was de\u2011activated later in the month, the seat remains counted for that month.\n\n3. **Can we receive a credit for the 11 seats we didn\u2019t use?**\n   Credits for seat over\u2011ages can be requested if the over\u2011provisioned seats were never activated during the month. Please submit a credit request within 30\u202fdays of the invoice date by navigating to Settings \u2192 Billing \u2192 Request Credit and include the invoice number and a brief explanation. Our billing team will review the request and get back to you.\n\nIf you have any additional questions or need help submitting the credit request, just let me know.\n\nBest regards,\n[Your Name] \u2013 Customer Support",
+  "internal_note": "Account: ACC-3336 \u2013 Omni Consumer Products. Tier: Business, Health: At Risk, Usage: Inactive, Renewal in 146 days. Churn signals: competitor evaluation, high open\u2011ticket count (7). Ticket is a billing clarification (how\u2011to). Route to L1_support. KB used: billing/billing-and-plans#how-seat-billing-works. Action: respond with billing explanation and credit request steps; monitor follow\u2011up. Notify TAM Rohan Mehta.",
+  "confidence": 0.97,
   "reasoning_trace": [
     {
       "step": 1,
       "action": "find_account",
-      "input": "by='company_name', value='Omni Consumer Products'",
-      "observation": "Found account ACC-3336 (Omni Consumer Products), Business tier."
+      "input": "find_account(by='account_id', value='ACC-8250') - Verify account details for ticket TKT-10455",
+      "observation": "{\"found\": false, \"note\": \"No account matches account_id='ACC-8250'. Try another key.\"}"
     },
     {
       "step": 2,
-      "action": "get_account",
-      "input": "account_id='ACC-3336'",
-      "observation": "Account profile loaded: Business tier, At Risk health, Inactive usage, competitor evaluation note."
+      "action": "find_account",
+      "input": "find_account(by='company_name', value='Omni Consumer Products') - Locate account for ticket TKT-10455 using company name",
+      "observation": "{\"found\": true, \"account_id\": \"ACC-3336\", \"company\": \"Omni Consumer Products\", \"plan_tier\": \"Business\"}"
     },
     {
       "step": 3,
+      "action": "get_account",
+      "input": "get_account(account_id='ACC-3336') - Retrieve full account info for ticket TKT-10455",
+      "observation": "{\"account_id\": \"ACC-3336\", \"company\": \"Omni Consumer Products\", \"tam\": \"Rohan Mehta\", \"plan_tier\": \"Business\", \"arr_usd\": 500000, \"seats_licensed\": 1845, \"seats_active\": 1693, \"products\": [\"WorkflowEngine\", \"AnalyticsHub\"], \"health_status\": \"At Risk\", \"usage_trend\": \"Inactive\", \"open_tickets\": 7, \"p..."
+    },
+    {
+      "step": 4,
+      "action": "get_ticket_history",
+      "input": "get_ticket_history(account_id='ACC-3336', days=180) - Check for duplicate billing inquiries for Omni Consumer Products",
+      "observation": "{\"window_days\": 180, \"tickets\": [{\"ticket_id\": \"TKT-10488\", \"created_at\": \"2026-03-16T16:59:32.204579Z\", \"subject\": \"CloudSync running extremely slowly for our team\", \"product\": \"CloudSync\", \"product_area\": \"Bandwidth Limits\", \"category\": \"Bug\", \"urgency\": \"P4\", \"status\": \"Closed\"}, {\"ticket_id\": \"T..."
+    },
+    {
+      "step": 5,
       "action": "search_kb",
-      "input": "query='DataBridge Pro invoice active users seat billing credit'",
-      "observation": "Found billing/billing-and-plans#how-seat-billing-works (current)."
+      "input": "search_kb(query='seat billing logic credit overage seats invoicing') - Find KB article for seat billing clarification",
+      "observation": "{\"results\": [{\"id\": \"billing/billing-and-plans#how-seat-billing-works\", \"heading\": \"How Seat Billing Works\", \"status\": \"current\", \"evidence\": null, \"replaced_by\": null, \"snippet\": \"## How Seat Billing Works\\n\\nA **seat** is any user account that was active (logged in or made an API call) at least on..."
     }
   ]
 }

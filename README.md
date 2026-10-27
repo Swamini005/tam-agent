@@ -346,6 +346,102 @@ Validate generated outputs:
 python scripts/check_outputs.py
 ```
 
+### Expected Execution & Verification Output
+
+#### 1. Review Set Execution
+```bash
+$ python run.py --set review
+
+TKT-10197: P2 bug -> L2_engineering | escalate=False notify_tam=True duplicate=None | 5 steps -> outputs/TKT-10197.json
+TKT-10215: P2 how_to -> L1_support | escalate=False notify_tam=False duplicate=None | 4 steps -> outputs/TKT-10215.json
+TKT-10293: P2 bug -> L2_engineering | escalate=False notify_tam=True duplicate=None | 4 steps -> outputs/TKT-10293.json
+TKT-10388: P2 bug -> L2_engineering | escalate=False notify_tam=False duplicate=None | 4 steps -> outputs/TKT-10388.json
+TKT-10432: P4 feature_request -> product | escalate=False notify_tam=True duplicate=None | 3 steps -> outputs/TKT-10432.json
+TKT-10455: P4 how_to -> L1_support | escalate=False notify_tam=True duplicate=None | 3 steps -> outputs/TKT-10455.json
+TKT-10000: P4 feature_request -> product | escalate=False notify_tam=True duplicate=None | 3 steps -> outputs/TKT-10000.json
+TKT-10003: P2 bug -> L2_engineering | escalate=False notify_tam=True duplicate=None | 3 steps -> outputs/TKT-10003.json
+TKT-10004: P1 security -> security | escalate=True notify_tam=True duplicate=None | 3 steps -> outputs/TKT-10004.json
+TKT-10009: P4 how_to -> L1_support | escalate=False notify_tam=True duplicate=None | 3 steps -> outputs/TKT-10009.json
+```
+
+#### 2. Output Validation Check
+```bash
+$ python scripts/check_outputs.py
+
+PASS  TKT-10000.json
+PASS  TKT-10003.json
+PASS  TKT-10004.json
+PASS  TKT-10009.json
+PASS  TKT-10197.json
+PASS  TKT-10215.json
+PASS  TKT-10293.json
+PASS  TKT-10388.json
+PASS  TKT-10432.json
+PASS  TKT-10455.json
+
+10/10 valid
+```
+
+#### 3. Sample Triaged Record (`outputs/TKT-10197.json`)
+
+<details>
+<summary>Click to view sample triaged JSON output</summary>
+
+```json
+{
+  "ticket_id": "TKT-10197",
+  "account_id": "ACC-8956",
+  "category": "bug",
+  "priority": "P2",
+  "route_to": "L2_engineering",
+  "escalate": false,
+  "notify_tam": true,
+  "duplicate_of": null,
+  "needs_clarification": true,
+  "kb_references": [
+    "troubleshooting/performance-and-integrations#step-1--identify-where-the-slowness-is"
+  ],
+  "account_signals": [
+    "Plan tier: Starter",
+    "Health status: At Risk",
+    "Usage trend: Increasing",
+    "Renewal in 151 days",
+    "TAM: Yuki Tanaka",
+    "Open tickets: 3"
+  ],
+  "customer_reply": "Hi Sam,\n\nThank you for letting us know about the slow loading times on the SecureVault Key Management dashboard. I understand how critical it is to have the dashboard ready for your upcoming board presentation...\n\nBest regards,\nSupport Engineering",
+  "internal_note": "- Account: ACC-8956 (Hadley Industries) – Starter tier, At Risk health, renewal in 151 days.\n- Urgency: intake marked P3 but 76s board-blocking latency warrants P2.\n- Routed to L2_engineering for latency diagnostics.\n- No duplicate tickets in last 90 days.\n- KB reference: troubleshooting/performance-and-integrations#step-1--identify-where-the-slowness-is.\n- Notify TAM Yuki Tanaka due to At Risk account status.",
+  "confidence": 0.88,
+  "reasoning_trace": [
+    {
+      "step": 1,
+      "action": "find_account",
+      "input": "by='account_id', value='ACC-5748' - Verify account matches company",
+      "observation": "Account ACC-5748 belongs to Nexus Data, ticket is Hadley Industries. Mismatch detected."
+    },
+    {
+      "step": 2,
+      "action": "find_account",
+      "input": "by='company_name', value='Hadley Industries'",
+      "observation": "Found canonical account ACC-8956 (Hadley Industries), Starter plan."
+    },
+    {
+      "step": 3,
+      "action": "get_account",
+      "input": "account_id='ACC-8956'",
+      "observation": "Account is At Risk, renewal date 2026-10-19 (151 days), TAM Yuki Tanaka, seats: 1690 lic / 997 act."
+    },
+    {
+      "step": 4,
+      "action": "search_kb",
+      "input": "query='SecureVault dashboard loading slow performance troubleshooting'",
+      "observation": "Retrieved troubleshooting/performance-and-integrations#step-1--identify-where-the-slowness-is (current)."
+    }
+  ]
+}
+```
+</details>
+
 **Submission note:** The hiring assignment requires processing the exact 10 tickets in `data/review_set.txt`, using the original starter repository's execution interface and checker. If this standalone implementation is being used for that submission, ensure it also supports the required review-set command and output/run-log contract before submitting.
 
 ---

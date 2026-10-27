@@ -7,45 +7,56 @@
   "escalate": false,
   "notify_tam": false,
   "duplicate_of": null,
-  "needs_clarification": true,
+  "needs_clarification": false,
   "kb_references": [
-    "troubleshooting/performance-and-integrations#snowflake-integration-common-issues",
-    "products/databridge-pro#connector-authentication-failure"
+    "products/databridge-pro#connectors"
   ],
   "account_signals": [
-    "Plan tier: Business",
-    "Health status: Healthy",
+    "Plan: Business",
+    "Health: Healthy",
     "Usage trend: Increasing",
-    "Renewal: 2026-08-14",
-    "TAM: Rohan Mehta"
+    "Open tickets: 8",
+    "Renewal in 123 days"
   ],
-  "customer_reply": "Hi Quinn,\n\nThank you for contacting support. I understand you are receiving a 500 Internal Server Error when establishing the Snowflake connector in DataBridge Pro.\n\nTo troubleshoot this OAuth exchange failure, please verify the following:\n\n1. Snowflake Role Privileges – Confirm the role has USAGE permissions on database/schema and SELECT on the target tables.\n2. Network Policies – If an IP allowlist is enforced in Snowflake, verify that our platform egress IP ranges are included.\n3. Redirect URI – Ensure the redirect URI registered in your Snowflake OAuth security integration exactly matches our connector callback URL.\n4. Configuration Snapshot – If possible, provide a screenshot of the connector settings page (with credentials obscured).\n\nWith these details, we will assist you in completing the integration setup.\n\nBest regards,\nIntegrations Support",
-  "internal_note": "- Account: ACC-6702 (Weyland Corp) – Business tier, Healthy health status, renewal in >90 days.\n- Ticket miscategorized at intake as Data Loss; actual issue is 500 OAuth upstream failure (bug/integration).\n- Routed to L2_engineering (Integrations).\n- KB references: troubleshooting/performance-and-integrations#snowflake-integration-common-issues, products/databridge-pro#connector-authentication-failure.\n- No duplicate tickets in last 90 days.\n- TAM notification not required.",
-  "confidence": 0.89,
+  "customer_reply": "Hi Quinn,\n\nThanks for reaching out about the Snowflake connector issue. The\u202f500\u202fupstream_failure you\u2019re seeing is typically caused by an authentication problem with the connector configuration.\n\nPlease try the following steps:\n\n1. Regenerate the OAuth token from the DataBridge Pro\u202f\u2192\u202fConnectors\u202f\u2192\u202fSnowflake settings page.\n2. Verify the redirect URI exactly matches the one registered in Snowflake (including any trailing slash).\n3. Confirm the token scopes include the required Snowflake permissions (snowflake:read, snowflake:write).\n4. If the token is older than\u202f60\u202fdays, refresh it to ensure it\u2019s still valid.\n\nIf the problem persists after these steps, let us know and include:\n- The exact connector version shown in the Settings page.\n- A screenshot of the token details (masking the secret).\n- Any recent changes to your Snowflake account (e.g., new network policies).\n\nWe\u2019ll investigate further once we have that info.\n\nBest regards,\nSupport Team",
+  "internal_note": "- Account: ACC-6702 (Weyland Corp) \u2013 Business plan, Healthy, usage increasing, 8 open tickets.\n- Issue: DataBridge Pro Snowflake connector returns 500 upstream_failure during OAuth token exchange.\n- Relevant KB: products/databridge-pro#connectors.\n- Likely cause: Mis\u2011configured OAuth token/redirect URI or expired token scopes.\n- Action: Follow KB steps; if unresolved, request connector version and token screenshot from customer.\n- No duplicate found; priority P2, routed to L2 engineering.",
+  "confidence": 0.94,
   "reasoning_trace": [
     {
       "step": 1,
       "action": "find_account",
-      "input": "by='account_id', value='ACC-9700'",
-      "observation": "account_id ACC-9700 not found."
+      "input": "find_account(by='account_id', value='ACC-9700') - Verify account details and correct plan tier for Weyland Corp",
+      "observation": "{\"found\": false, \"note\": \"No account matches account_id='ACC-9700'. Try another key.\"}"
     },
     {
       "step": 2,
       "action": "find_account",
-      "input": "by='company_name', value='Weyland Corp'",
-      "observation": "Found account ACC-6702 (Weyland Corp), Business tier."
+      "input": "find_account(by='company_name', value='Weyland Corp') - Find correct account for Weyland Corp",
+      "observation": "{\"found\": true, \"account_id\": \"ACC-6702\", \"company\": \"Weyland Corp\", \"plan_tier\": \"Business\"}"
     },
     {
       "step": 3,
       "action": "get_account",
-      "input": "account_id='ACC-6702'",
-      "observation": "Account profile loaded: Business tier, Healthy, renewal 2026-08-14."
+      "input": "get_account(account_id='ACC-6702') - Get full account profile for triage",
+      "observation": "{\"account_id\": \"ACC-6702\", \"company\": \"Weyland Corp\", \"tam\": \"Rohan Mehta\", \"plan_tier\": \"Business\", \"arr_usd\": 12000, \"seats_licensed\": 955, \"seats_active\": 822, \"products\": [\"AnalyticsHub\", \"SecureVault\", \"DataBridge Pro\"], \"health_status\": \"Healthy\", \"usage_trend\": \"Increasing\", \"open_tickets\": 8..."
     },
     {
       "step": 4,
       "action": "search_kb",
-      "input": "query='DataBridge Pro Snowflake integration 500 error OAuth'",
-      "observation": "Found troubleshooting/performance-and-integrations#snowflake-integration-common-issues."
+      "input": "search_kb(query='DataBridge Pro Snowflake authentication error upstream_failure') - Find KB article about known Snowflake integration issues",
+      "observation": "{\"results\": [{\"id\": \"onboarding/onboarding-guide#step-3-product-configuration-days-25\", \"heading\": \"Step 3: Product configuration (Days 2\\u20135)\", \"status\": \"current\", \"evidence\": null, \"replaced_by\": null, \"snippet\": \"### Step 3: Product configuration (Days 2\\u20135)\\n\\nRefer to the relevant produ..."
+    },
+    {
+      "step": 5,
+      "action": "search_kb",
+      "input": "search_kb(query='Snowflake DataBridge Pro connector authentication') - Find KB about Snowflake integration",
+      "observation": "{\"results\": [{\"id\": \"products/databridge-pro#connectors\", \"heading\": \"Connectors\", \"status\": \"current\", \"evidence\": null, \"replaced_by\": null, \"snippet\": \"### Connectors\\n\\nPre-built connectors are available for Salesforce, Snowflake, BigQuery, Jira, HubSpot, Slack, and 75+ others.\\n\\n- Connector ve..."
+    },
+    {
+      "step": 6,
+      "action": "get_ticket_history",
+      "input": "get_ticket_history(account_id='ACC-6702', days=90) - Check for duplicate or recurring Snowflake connector issues",
+      "observation": "{\"window_days\": 90, \"tickets\": [{\"ticket_id\": \"TKT-10292\", \"created_at\": \"2026-04-05T10:37:32.197479Z\", \"subject\": \"Data not syncing between CloudSync and HubSpot\", \"product\": \"CloudSync\", \"product_area\": \"Integrations\", \"category\": \"Feature Request\", \"urgency\": \"P2\", \"status\": \"In Progress\"}, {\"tic..."
     }
   ]
 }

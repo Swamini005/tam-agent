@@ -1,7 +1,7 @@
 {
   "ticket_id": "TKT-10197",
   "account_id": "ACC-8956",
-  "category": "bug",
+  "category": "incident",
   "priority": "P2",
   "route_to": "L2_engineering",
   "escalate": false,
@@ -9,50 +9,55 @@
   "duplicate_of": null,
   "needs_clarification": true,
   "kb_references": [
-    "troubleshooting/performance-and-integrations#step-1--identify-where-the-slowness-is"
+    "troubleshooting/performance-and-integrations#step-1--identify-where-the-slowness-is",
+    "troubleshooting/performance-and-integrations#analyticshub-dashboard-timeout"
   ],
   "account_signals": [
-    "Plan tier: Starter",
-    "Health status: At Risk",
-    "Usage trend: Increasing",
-    "Renewal in 151 days",
+    "Plan: Starter",
     "TAM: Yuki Tanaka",
-    "Open tickets: 3",
-    "Customer expressed frustration with response times in last sync"
+    "Health: At Risk",
+    "Renewal in 151 days",
+    "Usage: Increasing"
   ],
-  "customer_reply": "Hi Sam,\n\nThank you for letting us know about the slow loading times on the SecureVault Key Management dashboard. I understand how critical it is to have the dashboard ready for your upcoming board presentation.\n\nTo help us investigate effectively, could you please provide a few more details?\n\n1. Does the slowness affect only the Key Management dashboard, or all SecureVault pages?\n2. Which browser and version are you using?\n3. Have there been any recent network or environment changes (e.g. new VPN, firewall rules)?\n4. Are there any console errors or warnings visible in developer tools?\n5. Have you tested clearing the browser cache or accessing from another device?\n\nOnce we have this information, our engineering team will run targeted diagnostics to restore performance ahead of your presentation.\n\nBest regards,\nSupport Engineering",
-  "internal_note": "- Account: ACC-8956 (Hadley Industries) – Starter tier, At Risk health, renewal in 151 days.\n- Urgency: intake marked P3 but 76s board-blocking latency warrants P2.\n- Routed to L2_engineering for latency diagnostics.\n- No duplicate tickets in last 90 days.\n- KB reference: troubleshooting/performance-and-integrations#step-1--identify-where-the-slowness-is.\n- Notify TAM Yuki Tanaka due to At Risk account status.\n- No escalation required at this stage.",
-  "confidence": 0.88,
+  "customer_reply": "Hi Sam,\n\nThank you for letting us know about the slow\u2011loading Key Management dashboard in SecureVault. A 76\u2011second load time is far above the normal experience, and we\u2019ll work with you to get it back to speed before your board presentation.\n\nTo diagnose the issue efficiently, could you please provide the following details?\n1. **Dashboard composition** \u2013 How many widgets are on the dashboard, and which of them show the longest load time?\n2. **Date range / data scope** \u2013 Are you querying data that spans many months or years?\n3. **Recent changes** \u2013 Have you added new data sources, changed permissions, or updated any SecureVault settings in the past two weeks?\n4. **Browser & network** \u2013 Which browser (and version) are you using, and does the slowness occur on other browsers or on a different network (e.g., VPN vs. direct internet)?\n5. **Error messages** \u2013 Do you see any error messages or time\u2011out warnings in the UI or in the browser console?\n\nIn the meantime, you can start the standard performance\u2011troubleshooting steps outlined in our Knowledge Base:\n- **Identify the slow component** \u2013 Open the dashboard, edit the slowest widget, and launch the Query Profiler (see KB \u201cStep\u202f1 \u2013 Identify where the slowness is\u201d).\n- **Check for full\u2011table scans** \u2013 Look for queries without WHERE clauses or missing indexes.\n- **Add date filters** \u2013 Limiting the data window (e.g., last 30\u202fdays) often reduces load time dramatically.\n- **Enable caching** \u2013 In Settings\u202f\u2192\u202fData Sources, turn on caching for the affected source.\n\nOnce we have the details above, we can narrow down the root cause and apply the appropriate fix.\n\nThank you, and we\u2019ll keep this ticket high priority until the dashboard is performing normally.\n\nBest regards,\n[Your Name] \u2013 L2 Support",
+  "internal_note": "- Account: ACC-8956 (Hadley Industries), Starter plan, Health At Risk, TAM Yuki Tanaka\n- Category: incident, Priority: P2\n- Routing: L2_engineering for performance investigation\n- No duplicate tickets found for SecureVault dashboard issues\n- KB references used for initial troubleshooting steps\n- Next steps: request clarification details (widget list, date range, recent changes, browser/network, errors) and guide through Query Profiler and caching",
+  "confidence": 0.93,
   "reasoning_trace": [
     {
       "step": 1,
       "action": "find_account",
-      "input": "by='account_id', value='ACC-5748' - Verify account matches company",
-      "observation": "Account ACC-5748 belongs to Nexus Data, ticket is Hadley Industries. Mismatch detected."
+      "input": "find_account(by='account_id', value='ACC-5748') - Verify account details for Hadley Industries ticket",
+      "observation": "{\"found\": true, \"account_id\": \"ACC-5748\", \"company\": \"Nexus Data\", \"plan_tier\": \"Starter\", \"warning\": \"This account is Nexus Data, but the ticket is from Hadley Industries. Probably the wrong account; look it up by company name.\"}"
     },
     {
       "step": 2,
       "action": "find_account",
-      "input": "by='company_name', value='Hadley Industries'",
-      "observation": "Found canonical account ACC-8956 (Hadley Industries), Starter plan."
+      "input": "find_account(by='company_name', value='Hadley Industries') - Find correct account for Hadley Industries",
+      "observation": "{\"found\": true, \"account_id\": \"ACC-8956\", \"company\": \"Hadley Industries\", \"plan_tier\": \"Starter\"}"
     },
     {
       "step": 3,
       "action": "get_account",
-      "input": "account_id='ACC-8956'",
-      "observation": "Account is At Risk, renewal date 2026-10-19 (151 days), TAM Yuki Tanaka, seats: 1690 lic / 997 act."
+      "input": "get_account(account_id='ACC-8956') - Get full profile for triage",
+      "observation": "{\"account_id\": \"ACC-8956\", \"company\": \"Hadley Industries\", \"tam\": \"Yuki Tanaka\", \"plan_tier\": \"Starter\", \"arr_usd\": 500000, \"seats_licensed\": 1690, \"seats_active\": 997, \"products\": [\"DataBridge Pro\", \"AnalyticsHub\", \"WorkflowEngine\", \"SecureVault\"], \"health_status\": \"At Risk\", \"usage_trend\": \"Increa..."
     },
     {
       "step": 4,
       "action": "get_ticket_history",
-      "input": "account_id='ACC-8956', days=90",
-      "observation": "Found 3 previous tickets; no duplicate dashboard performance tickets."
+      "input": "get_ticket_history(account_id='ACC-8956', days=90) - Check for recent similar tickets about SecureVault dashboard performance",
+      "observation": "{\"window_days\": 90, \"tickets\": [{\"ticket_id\": \"TKT-10114\", \"created_at\": \"2026-05-16T11:42:32.189834Z\", \"subject\": \"Feature request: export Pipeline Monitoring data to Okta\", \"product\": \"DataBridge Pro\", \"product_area\": \"Pipeline Monitoring\", \"category\": \"Feature Request\", \"urgency\": \"P4\", \"status\":..."
     },
     {
       "step": 5,
       "action": "search_kb",
-      "input": "query='SecureVault dashboard loading slow performance troubleshooting'",
-      "observation": "Retrieved troubleshooting/performance-and-integrations#step-1--identify-where-the-slowness-is (current)."
+      "input": "search_kb(query='SecureVault dashboard loading time troubleshooting') - Find KB article for performance issues",
+      "observation": "{\"results\": [{\"id\": \"troubleshooting/performance-and-integrations#analyticshub-dashboard-timeout\", \"heading\": \"AnalyticsHub: Dashboard Timeout\", \"status\": \"current\", \"evidence\": null, \"replaced_by\": null, \"snippet\": \"## AnalyticsHub: Dashboard Timeout\\n\\n**Symptom:** Dashboard fails to load; spinner..."
+    },
+    {
+      "step": 6,
+      "action": "search_kb",
+      "input": "search_kb(query='SecureVault dashboard performance slow loading') - Find KB article specific to SecureVault dashboard performance",
+      "observation": "{\"results\": [{\"id\": \"troubleshooting/performance-and-integrations#step-1--identify-where-the-slowness-is\", \"heading\": \"Step 1 \\u2014 Identify where the slowness is\", \"status\": \"current\", \"evidence\": null, \"replaced_by\": null, \"snippet\": \"### Step 1 \\u2014 Identify where the slowness is\\n\\n- **UI slo..."
     }
   ]
 }

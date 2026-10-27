@@ -12,33 +12,46 @@
     "products/databridge-pro#data-ingestion"
   ],
   "account_signals": [
-    "Plan tier: Starter",
-    "Health status: At Risk",
-    "Usage trend: Inactive",
-    "Renewal: 2027-03-01",
-    "TAM: Fatima Al-Rashid"
+    "Plan: Starter",
+    "Health: At Risk",
+    "Usage: Inactive",
+    "Renewal in 370 days",
+    "Open tickets: 11",
+    "P1 tickets last 30d: 2"
   ],
-  "customer_reply": "Hi,\n\nThank you for reaching out to us. We understand that having a bulk archive operation in Data Ingestion is essential as your team scales to 116 users.\n\nCurrently, DataBridge Pro supports archiving entries individually. We have forwarded your request directly to our Product team as an enhancement suggestion for bulk data management operations.\n\nWe will update you on this ticket as our product roadmap develops. In the meantime, please let us know if we can assist with scripting this via our public API as a temporary automation.\n\nBest regards,\nProduct Support",
-  "internal_note": "- Account: ACC-1881 (Massive Dynamic) – Starter tier, At Risk health, Inactive usage.\n- Ticket miscategorized as Billing P2 at intake; this is a clear feature_request, priority P4, routed to product.\n- Policy requires notify_tam=True due to At Risk health status and Inactive usage trend.\n- No duplicate tickets in last 90 days.\n- KB references: products/databridge-pro#data-ingestion.",
-  "confidence": 0.95,
+  "customer_reply": "Hi Alex,\n\nThank you for sharing the need for bulk\u2011archive functionality in DataBridge Pro\u2019s Data Ingestion module. I\u2019ve logged this as a feature request and forwarded it to our product team for review.\n\nAt this time the platform only supports archiving individual entries, so a bulk operation isn\u2019t available. We\u2019ll keep you posted on any updates or timelines regarding this capability.\n\nIf you have any additional details (e.g., specific use\u2011cases, desired UI flow) that could help us prioritize, feel free to let us know.\n\nBest regards,\nSupport Team",
+  "internal_note": "Account: ACC-1881 (Massive Dynamic) \u2013 Starter plan\nHealth: At Risk, Usage: Inactive\nRenewal: 370 days out (no immediate renewal window)\nTAM: Fatima Al\u2011Rashid (notify)\nOpen tickets: 11 (2 P1 tickets in last 30\u202fd) \u2013 potential churn risk\nTicket type: Feature request (bulk archive for Data Ingestion) \u2013 no existing KB solution; see products/databridge-pro#data-ingestion for current capabilities.\nAction: Route to Product team; monitor for any follow\u2011up from the customer.",
+  "confidence": 0.97,
   "reasoning_trace": [
     {
       "step": 1,
       "action": "find_account",
-      "input": "by='company_name', value='Massive Dynamic'",
-      "observation": "Found account ACC-1881 (Massive Dynamic), Starter tier."
+      "input": "find_account(by='account_id', value='ACC-2535') - Verify account exists and matches company Massive Dynamic",
+      "observation": "{\"found\": false, \"note\": \"No account matches account_id='ACC-2535'. Try another key.\"}"
     },
     {
       "step": 2,
-      "action": "get_account",
-      "input": "account_id='ACC-1881'",
-      "observation": "Account profile loaded: Starter tier, At Risk health, Inactive usage trend, TAM Fatima Al-Rashid."
+      "action": "find_account",
+      "input": "find_account(by='company_name', value='Massive Dynamic') - Find account for Massive Dynamic",
+      "observation": "{\"found\": true, \"account_id\": \"ACC-1881\", \"company\": \"Massive Dynamic\", \"plan_tier\": \"Starter\"}"
     },
     {
       "step": 3,
+      "action": "get_account",
+      "input": "get_account(account_id='ACC-1881') - Retrieve full account profile for triage",
+      "observation": "{\"account_id\": \"ACC-1881\", \"company\": \"Massive Dynamic\", \"tam\": \"Fatima Al-Rashid\", \"plan_tier\": \"Starter\", \"arr_usd\": 12000, \"seats_licensed\": 350, \"seats_active\": 321, \"products\": [\"DataBridge Pro\", \"AnalyticsHub\", \"SecureVault\", \"WorkflowEngine\"], \"health_status\": \"At Risk\", \"usage_trend\": \"Inact..."
+    },
+    {
+      "step": 4,
+      "action": "get_ticket_history",
+      "input": "get_ticket_history(account_id='ACC-1881', days=90) - Check for duplicate feature request about bulk archive",
+      "observation": "{\"window_days\": 90, \"tickets\": []}"
+    },
+    {
+      "step": 5,
       "action": "search_kb",
-      "input": "query='DataBridge Pro bulk archive entries Data Ingestion'",
-      "observation": "Retrieved products/databridge-pro#data-ingestion; bulk archive not currently supported."
+      "input": "search_kb(query='bulk archive DataBridge Pro Data Ingestion') - Find if KB exists for bulk archive functionality",
+      "observation": "{\"results\": [{\"id\": \"onboarding/onboarding-guide#step-3-product-configuration-days-25\", \"heading\": \"Step 3: Product configuration (Days 2\\u20135)\", \"status\": \"current\", \"evidence\": null, \"replaced_by\": null, \"snippet\": \"### Step 3: Product configuration (Days 2\\u20135)\\n\\nRefer to the relevant produ..."
     }
   ]
 }
